@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { FaTimes } from 'react-icons/fa';
 
 
 function App() {
@@ -21,19 +22,19 @@ function App() {
     const onDragEnd = (result) => {
         const { source, destination } = result;
         if (!destination) {
-            return; // dropped outside the list
+          return;
         }
-
+      
         if (source.droppableId === destination.droppableId) {
-            const items = reorder(
-                categories[source.droppableId],
-                source.index,
-                destination.index
-            );
-            const newCategories = { ...categories, [source.droppableId]: items };
-            setCategories(newCategories);
+          const items = reorder(
+            categories[source.droppableId],
+            source.index,
+            destination.index
+          );
+          const newCategories = { ...categories, [source.droppableId]: items };
+          setCategories(newCategories);
         }
-    };
+      };
 
     const reorder = (list, startIndex, endIndex) => {
         const result = Array.from(list);
@@ -76,36 +77,65 @@ function App() {
         link.click();
     };
 
+    const handleRemoveFile = (category, fileId) => {
+        const updatedFiles = categories[category].filter(file => file.id !== fileId);
+        setCategories({ ...categories, [category]: updatedFiles });
+      };
+
     return (
-        <div className="App">
-            <input type="text" onChange={handleCategoryInput} placeholder="Enter categories separated by commas (e.g., A, B, C)" />
+        <div className="app-container">
+            <img src="/logo.png" alt="Logo" style={{ width: '300px', marginBottom: '20px' }} />
+            <input
+                type="text"
+                onChange={handleCategoryInput}
+                placeholder="Enter categories separated by commas (e.g., A, B, C)"
+                style={{ width: '430px' }} 
+            />
             <DragDropContext onDragEnd={onDragEnd}>
                 {categoryList.map(category => (
                     <Droppable droppableId={category} key={category}>
                         {(provided) => (
-                            <div {...provided.droppableProps} ref={provided.innerRef}>
-                                <h4>Category {category}</h4>
-                                <input type="file" multiple onChange={(e) => handleFileChange(category, e)} />
-                                {categories[category].map((file, index) => (
-                                    <Draggable key={file.id} draggableId={file.id} index={index}>
-                                        {(provided) => (
-                                            <div
-                                                ref={provided.innerRef}
-                                                {...provided.draggableProps}
-                                                {...provided.dragHandleProps}
-                                                style={{ marginBottom: '8px', backgroundColor: '#f4f4f4', padding: '10px' }}
-                                            >
-                                                {file.name}
-                                            </div>
-                                        )}
-                                    </Draggable>
-                                ))}
-                                {provided.placeholder}
-                            </div>
+                        <div {...provided.droppableProps} ref={provided.innerRef}>
+                            <h4>Category {category}</h4>
+                            <input type="file" multiple onChange={(e) => handleFileChange(category, e)} />
+                            {categories[category].map((file, index) => (
+                            <Draggable key={file.id} draggableId={file.id} index={index}>
+                                {(provided) => (
+                                <div
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    style={{
+                                    marginBottom: '8px',
+                                    backgroundColor: '#f4f4f4',
+                                    padding: '10px',
+                                    borderRadius: '4px',
+                                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                                    ...provided.draggableProps.style,
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    }}
+                                >
+                                    {file.name}
+                                    <FaTimes
+                                    onClick={() => handleRemoveFile(category, file.id)}
+                                    style={{
+                                        color: '#888',
+                                        cursor: 'pointer',
+                                        fontSize: '14px',
+                                    }}
+                                    />
+                                </div>
+                                )}
+                            </Draggable>
+                            ))}
+                            {provided.placeholder}
+                        </div>
                         )}
                     </Droppable>
-                ))}
-            </DragDropContext>
+                    ))}
+                </DragDropContext>
             <button onClick={handleMerge}>Merge and Label PDFs</button>
         </div>
     );
