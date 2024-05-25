@@ -112,8 +112,8 @@ function App() {
             <input
                 type="text"
                 onChange={handleCategoryInput}
-                placeholder="Enter categories separated by commas (e.g., A, B, C or a space for no category)"
-                style={{ width: '430px' }}
+                placeholder="Enter categories separated by commas (e.g., A,B,C or a space for no category)"
+                style={{ width: '630px' }}
             />
             <DragDropContext onDragEnd={onDragEnd}>
                 {categoryList.map(category => (
