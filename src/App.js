@@ -62,6 +62,8 @@ function App() {
             });
         });
     
+        console.log('FormData:', formData); // Debugging: Log FormData content
+    
         try {
             const response = await axios.post('http://127.0.0.1:5000/merge', formData, {
                 headers: {
@@ -69,6 +71,8 @@ function App() {
                 },
                 responseType: 'blob',
             });
+    
+            console.log('Response:', response); // Debugging: Log the response
     
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
@@ -92,7 +96,7 @@ function App() {
             }
             console.error('Config:', error.config);
         }
-    };
+    };    
 
     const handleRemoveFile = (category, fileId) => {
         const updatedFiles = categories[category].filter(file => file.id !== fileId);

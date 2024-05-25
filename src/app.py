@@ -1,4 +1,4 @@
-from flask import Flask, request, send_file
+from flask import Flask, request, send_file, jsonify
 from flask_cors import CORS 
 from PyPDF2 import PdfWriter, PdfReader
 from reportlab.lib.pagesizes import letter
@@ -13,14 +13,24 @@ CORS(app, resources={r"/merge": {"origins": "http://localhost:3000"}})
 
 @app.route('/merge', methods=['POST'])
 def merge_files():
-    files = request.files.getlist('files')
-    labels = request.form.getlist('labels')
-    output_pdf = merge_pdfs(files, labels)
-    return send_file(
-        output_pdf,
-        as_attachment=True,
-        download_name='Merged.pdf' 
-    )
+    try:
+        files = request.files.getlist('files')
+        labels = request.form.getlist('labels')
+        print('Received files:', files) # Debugging: Log received files
+        print('Received labels:', labels) # Debugging: Log received labels
+
+        if not files or not labels:
+            return jsonify({"error": "No files or labels provided"}), 400
+        output_pdf = merge_pdfs(files, labels)
+        return send_file(
+            output_pdf,
+            as_attachment=True,
+            download_name='Merged.pdf'
+        )
+    except Exception as e:
+        print('Error:', str(e)) # Debugging: Log any exceptions
+        return jsonify({"error": str(e)}), 500
+
 
 def merge_pdfs(files, labels):
     writer = PdfWriter()
