@@ -39,7 +39,7 @@ cd /d %~dp0
 
 :: Starting the Flask API
 echo Starting Flask API...
-start /B "" cmd /C "call venv\Scripts\activate && set FLASK_APP=src\app.py && set FLASK_ENV=development && flask run"
+start /B "" cmd /C "set FLASK_APP=src\app.py && set FLASK_ENV=development && flask run"
 
 :: Starting the React App
 echo Starting React App...
