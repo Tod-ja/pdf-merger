@@ -61,20 +61,37 @@ function App() {
                 formData.append('labels', `${category}${index + 1}`);
             });
         });
-
-        const response = await axios.post('http://localhost:5000/merge', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            },
-            responseType: 'blob',
-        });
-
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', 'Merged.pdf');
-        document.body.appendChild(link);
-        link.click();
+    
+        try {
+            const response = await axios.post('http://127.0.0.1:5000/merge', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                },
+                responseType: 'blob',
+            });
+    
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'Merged.pdf');
+            document.body.appendChild(link);
+            link.click();
+        } catch (error) {
+            console.error('There was an error!', error);
+            if (error.response) {
+                // Server responded with a status other than 200 range
+                console.error('Response data:', error.response.data);
+                console.error('Response status:', error.response.status);
+                console.error('Response headers:', error.response.headers);
+            } else if (error.request) {
+                // Request was made but no response received
+                console.error('Request data:', error.request);
+            } else {
+                // Something else happened in making the request
+                console.error('Error message:', error.message);
+            }
+            console.error('Config:', error.config);
+        }
     };
 
     const handleRemoveFile = (category, fileId) => {
