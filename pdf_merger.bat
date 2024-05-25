@@ -6,7 +6,7 @@ cd /d %~dp0
 
 :: Starting the Flask API
 echo Starting Flask API...
-start /B "" cmd /C "set FLASK_APP=src\app.py && set FLASK_ENV=development && flask run > flask_log.txt 2>&1"
+start /B "" cmd /C "python src\app.py > flask_log.txt 2>&1"
 if %errorlevel% neq 0 (
     echo Failed to start Flask API.
     exit /b
