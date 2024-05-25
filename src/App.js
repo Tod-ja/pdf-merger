@@ -3,13 +3,15 @@ import axios from 'axios';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { FaTimes } from 'react-icons/fa';
 
-
 function App() {
     const [categories, setCategories] = useState({});
     const [categoryList, setCategoryList] = useState([]);
 
     const handleCategoryInput = (event) => {
-        let newCategories = event.target.value.split(',').map(c => c.trim().toUpperCase()).filter(c => c);
+        let newCategories = event.target.value.split(',').map(c => c.trim().toUpperCase()).filter(c => c !== '');
+        if (event.target.value.includes(' ')) {
+            newCategories.push(' '); // Handle category without a name
+        }
         setCategoryList(newCategories);
         newCategories.forEach(cat => {
             if (!categories[cat]) {
@@ -22,19 +24,19 @@ function App() {
     const onDragEnd = (result) => {
         const { source, destination } = result;
         if (!destination) {
-          return;
+            return;
         }
-      
+
         if (source.droppableId === destination.droppableId) {
-          const items = reorder(
-            categories[source.droppableId],
-            source.index,
-            destination.index
-          );
-          const newCategories = { ...categories, [source.droppableId]: items };
-          setCategories(newCategories);
+            const items = reorder(
+                categories[source.droppableId],
+                source.index,
+                destination.index
+            );
+            const newCategories = { ...categories, [source.droppableId]: items };
+            setCategories(newCategories);
         }
-      };
+    };
 
     const reorder = (list, startIndex, endIndex) => {
         const result = Array.from(list);
@@ -58,12 +60,13 @@ function App() {
         Object.keys(categories).forEach(category => {
             categories[category].forEach((file, index) => {
                 formData.append('files', file.data);
-                formData.append('labels', `${category}${index + 1}`);
+                const label = category.trim() === '' ? `${index + 1}` : `${category}${index + 1}`;
+                formData.append('labels', label);
             });
         });
-    
+
         console.log('FormData:', formData); // Debugging: Log FormData content
-    
+
         try {
             const response = await axios.post('http://127.0.0.1:5000/merge', formData, {
                 headers: {
@@ -71,9 +74,9 @@ function App() {
                 },
                 responseType: 'blob',
             });
-    
+
             console.log('Response:', response); // Debugging: Log the response
-    
+
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
@@ -96,12 +99,12 @@ function App() {
             }
             console.error('Config:', error.config);
         }
-    };    
+    };
 
     const handleRemoveFile = (category, fileId) => {
         const updatedFiles = categories[category].filter(file => file.id !== fileId);
         setCategories({ ...categories, [category]: updatedFiles });
-      };
+    };
 
     return (
         <div className="app-container">
@@ -109,54 +112,54 @@ function App() {
             <input
                 type="text"
                 onChange={handleCategoryInput}
-                placeholder="Enter categories separated by commas (e.g., A, B, C)"
-                style={{ width: '430px' }} 
+                placeholder="Enter categories separated by commas (e.g., A, B, C or a space for no category)"
+                style={{ width: '430px' }}
             />
             <DragDropContext onDragEnd={onDragEnd}>
                 {categoryList.map(category => (
                     <Droppable droppableId={category} key={category}>
                         {(provided) => (
-                        <div {...provided.droppableProps} ref={provided.innerRef}>
-                            <h4>Category {category}</h4>
-                            <input type="file" multiple onChange={(e) => handleFileChange(category, e)} />
-                            {categories[category].map((file, index) => (
-                            <Draggable key={file.id} draggableId={file.id} index={index}>
-                                {(provided) => (
-                                <div
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                    style={{
-                                    marginBottom: '8px',
-                                    backgroundColor: '#f4f4f4',
-                                    padding: '10px',
-                                    borderRadius: '4px',
-                                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                                    ...provided.draggableProps.style,
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    }}
-                                >
-                                    {file.name}
-                                    <FaTimes
-                                    onClick={() => handleRemoveFile(category, file.id)}
-                                    style={{
-                                        color: '#888',
-                                        cursor: 'pointer',
-                                        fontSize: '14px',
-                                    }}
-                                    />
-                                </div>
-                                )}
-                            </Draggable>
-                            ))}
-                            {provided.placeholder}
-                        </div>
+                            <div {...provided.droppableProps} ref={provided.innerRef}>
+                                <h4>Category {category.trim() === '' ? 'Unnamed' : category}</h4>
+                                <input type="file" multiple onChange={(e) => handleFileChange(category, e)} />
+                                {categories[category].map((file, index) => (
+                                    <Draggable key={file.id} draggableId={file.id} index={index}>
+                                        {(provided) => (
+                                            <div
+                                                ref={provided.innerRef}
+                                                {...provided.draggableProps}
+                                                {...provided.dragHandleProps}
+                                                style={{
+                                                    marginBottom: '8px',
+                                                    backgroundColor: '#f4f4f4',
+                                                    padding: '10px',
+                                                    borderRadius: '4px',
+                                                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                                                    ...provided.draggableProps.style,
+                                                    display: 'flex',
+                                                    justifyContent: 'space-between',
+                                                    alignItems: 'center',
+                                                }}
+                                            >
+                                                {file.name}
+                                                <FaTimes
+                                                    onClick={() => handleRemoveFile(category, file.id)}
+                                                    style={{
+                                                        color: '#888',
+                                                        cursor: 'pointer',
+                                                        fontSize: '14px',
+                                                    }}
+                                                />
+                                            </div>
+                                        )}
+                                    </Draggable>
+                                ))}
+                                {provided.placeholder}
+                            </div>
                         )}
                     </Droppable>
-                    ))}
-                </DragDropContext>
+                ))}
+            </DragDropContext>
             <button onClick={handleMerge}>Merge and Label PDFs</button>
         </div>
     );
