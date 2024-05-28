@@ -39,23 +39,45 @@ def merge_pdfs(files, labels):
             if page_num == 0:
                 width = float(page.mediabox.width)
                 height = float(page.mediabox.height)
+                
+                rotation = page.get('/Rotate', 0)
+                print(f'Page rotation: {rotation}')  # Debugging: Log rotation
+
                 buffer = BytesIO()
                 c = canvas.Canvas(buffer, pagesize=(width, height))
                 label_size = 60
                 right_margin = 25
                 top_margin = 20
-                label_x = width - label_size // 2 - right_margin
-                label_y = height - label_size // 2 - top_margin
+
+                if rotation == 90:
+                    c.translate(height, 0)
+                    c.rotate(90)
+                    label_x = right_margin
+                    label_y = width - label_size - top_margin
+                elif rotation == 180:
+                    c.translate(width, height)
+                    c.rotate(180)
+                    label_x = right_margin
+                    label_y = label_size + top_margin
+                elif rotation == 270:
+                    c.translate(0, width)
+                    c.rotate(270)
+                    label_x = width - label_size - right_margin
+                    label_y = width - label_size - top_margin
+                else:
+                    label_x = width - label_size - right_margin
+                    label_y = height - label_size - top_margin
+
                 c.setFillColor(colors.transparent)
                 c.setStrokeColor(colors.black)
                 c.setLineWidth(2)
-                c.circle(label_x, label_y, label_size // 2, stroke=1, fill=0)
+                c.circle(label_x + label_size // 2, label_y + label_size // 2, label_size // 2, stroke=1, fill=0)
                 font_size = label_size // 2
                 c.setFont("Helvetica-Bold", font_size)
                 c.setFillColor(colors.black)
                 text_width = c.stringWidth(label, "Helvetica-Bold", font_size)
-                text_x = label_x - text_width // 2
-                text_y = label_y - font_size // 3
+                text_x = label_x + (label_size // 2) - (text_width // 2)
+                text_y = label_y + (label_size // 2) - (font_size // 3)
                 c.drawString(text_x, text_y, label)
                 c.showPage()
                 c.save()
