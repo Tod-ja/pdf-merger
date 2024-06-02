@@ -37,9 +37,6 @@ SETLOCAL ENABLEDELAYEDEXPANSION
 :: Ensure the script is executed in the root directory of the project
 cd /d %~dp0
 
-:: Log current directory for debugging
-echo Current directory: %~dp0
-
 :: Start the Flask API and React App concurrently and log their outputs
 echo Starting Flask API and React App...
 start /B "" cmd /C "python src\app.py > flask_log.txt 2>&1" && start /B "" cmd /C "npm start > react_log.txt 2>&1"

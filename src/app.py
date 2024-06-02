@@ -19,14 +19,11 @@ def merge_files():
         files = request.files.getlist('files')
         labels = request.form.getlist('labels')
         start_numbers = request.form.getlist('start_numbers')
-        print('Received files:', files)  # Debugging: Log received files
-        print('Received labels:', labels)  # Debugging: Log received labels
-        print('Received start numbers:', start_numbers)  # Debugging: Log start numbers
 
         if not files or not labels or not start_numbers:
             return jsonify({"error": "Files, labels or start numbers are missing"}), 400
 
-        start_numbers = [int(num) for num in start_numbers]  # Convert to integers
+        start_numbers = [int(num) for num in start_numbers] 
         output_pdf = merge_pdfs(files, labels, start_numbers)
         return send_file(
             output_pdf,
@@ -34,12 +31,10 @@ def merge_files():
             download_name='Merged.pdf'
         )
     except Exception as e:
-        print('Error in merge_files:', str(e))  # Debugging: Log any exceptions
         return jsonify({"error": str(e)}), 500
 
 def convert_image_to_pdf(image_stream):
     try:
-        # Read the image stream into a PIL Image
         image = Image.open(image_stream)
 
         # Create a temporary file to hold the image
@@ -86,7 +81,6 @@ def convert_image_to_pdf(image_stream):
 
         return page
     except Exception as e:
-        print('Error in convert_image_to_pdf:', str(e))  # Debugging: Log any exceptions
         raise
 
 def merge_pdfs(files, labels, start_numbers):
@@ -116,7 +110,6 @@ def merge_pdfs(files, labels, start_numbers):
                     height = float(page.mediabox.height)
                     
                     rotation = page.get('/Rotate', 0)
-                    print(f'Page rotation: {rotation}')  # Debugging: Log rotation
 
                     buffer = BytesIO()
                     c = canvas.Canvas(buffer, pagesize=(width, height))
@@ -167,7 +160,6 @@ def merge_pdfs(files, labels, start_numbers):
         output.seek(0)
         return output
     except Exception as e:
-        print('Error in merge_pdfs:', str(e))  # Debugging: Log any exceptions
         raise
 
 if __name__ == '__main__':
