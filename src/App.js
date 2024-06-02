@@ -6,19 +6,34 @@ import { FaTimes } from 'react-icons/fa';
 function App() {
     const [categories, setCategories] = useState({});
     const [categoryList, setCategoryList] = useState([]);
+    const [startNumbers, setStartNumbers] = useState({});
 
     const handleCategoryInput = (event) => {
-        let newCategories = event.target.value.split(',').map(c => c.trim().toUpperCase()).filter(c => c !== '');
-        if (event.target.value.includes(' ')) {
-            newCategories.push(' '); // Handle category without a name
-        }
-        setCategoryList(newCategories);
-        newCategories.forEach(cat => {
+        const inputCategories = event.target.value.split(',')
+            .map(c => c.trim() === '' ? `Unnamed-${Math.random().toString(36).substr(2, 9)}` : c.trim().toUpperCase())
+            .filter(c => c);
+
+        const uniqueCategories = [...new Set(inputCategories)];
+        
+        setCategoryList(uniqueCategories);
+
+        const newCategoriesObj = {};
+        const newStartNumbers = {};
+        uniqueCategories.forEach(cat => {
             if (!categories[cat]) {
-                categories[cat] = [];
-                setCategories({ ...categories });
+                newCategoriesObj[cat] = [];
+                newStartNumbers[cat] = 1;
+            } else {
+                newCategoriesObj[cat] = categories[cat];
+                newStartNumbers[cat] = startNumbers[cat] || 1;
             }
         });
+        setCategories(newCategoriesObj);
+        setStartNumbers(newStartNumbers);
+    };
+
+    const handleStartNumberChange = (category, event) => {
+        setStartNumbers({ ...startNumbers, [category]: parseInt(event.target.value) });
     };
 
     const onDragEnd = (result) => {
@@ -60,12 +75,10 @@ function App() {
         Object.keys(categories).forEach(category => {
             categories[category].forEach((file, index) => {
                 formData.append('files', file.data);
-                const label = category.trim() === '' ? `${index + 1}` : `${category}${index + 1}`;
-                formData.append('labels', label);
+                formData.append('labels', category.startsWith('Unnamed-') ? '' : category);
             });
+            formData.append('start_numbers', startNumbers[category]);
         });
-
-        console.log('FormData:', formData); // Debugging: Log FormData content
 
         try {
             const response = await axios.post('http://127.0.0.1:5000/merge', formData, {
@@ -74,8 +87,6 @@ function App() {
                 },
                 responseType: 'blob',
             });
-
-            console.log('Response:', response); // Debugging: Log the response
 
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
@@ -86,15 +97,12 @@ function App() {
         } catch (error) {
             console.error('There was an error!', error);
             if (error.response) {
-                // Server responded with a status other than 200 range
                 console.error('Response data:', error.response.data);
                 console.error('Response status:', error.response.status);
                 console.error('Response headers:', error.response.headers);
             } else if (error.request) {
-                // Request was made but no response received
                 console.error('Request data:', error.request);
             } else {
-                // Something else happened in making the request
                 console.error('Error message:', error.message);
             }
             console.error('Config:', error.config);
@@ -112,16 +120,30 @@ function App() {
             <input
                 type="text"
                 onChange={handleCategoryInput}
-                placeholder="Enter categories separated by commas (e.g., A,B,C or a space for no category)"
-                style={{ width: '630px' }}
+                placeholder="Enter categories separated by commas (e.g., A, B, C)"
+                style={{ width: '430px' }}
             />
             <DragDropContext onDragEnd={onDragEnd}>
                 {categoryList.map(category => (
                     <Droppable droppableId={category} key={category}>
                         {(provided) => (
                             <div {...provided.droppableProps} ref={provided.innerRef}>
-                                <h4>Category {category.trim() === '' ? 'Unnamed' : category}</h4>
-                                <input type="file" multiple onChange={(e) => handleFileChange(category, e)} />
+                                <h4>Category {category.startsWith('Unnamed-') ? 'Unnamed' : category}</h4>
+                                <input
+                                    type="file"
+                                    multiple
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                    onChange={(e) => handleFileChange(category, e)}
+                                />
+                                <label>
+                                    First file number:
+                                    <input
+                                        type="number"
+                                        value={startNumbers[category]}
+                                        onChange={(e) => handleStartNumberChange(category, e)}
+                                        placeholder="Start number"
+                                    />
+                                </label>
                                 {categories[category].map((file, index) => (
                                     <Draggable key={file.id} draggableId={file.id} index={index}>
                                         {(provided) => (
