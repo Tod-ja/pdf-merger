@@ -22,10 +22,10 @@ function App() {
         uniqueCategories.forEach(cat => {
             if (!categories[cat]) {
                 newCategoriesObj[cat] = [];
-                newStartNumbers[cat] = 1;
+                newStartNumbers[cat] = "None";
             } else {
                 newCategoriesObj[cat] = categories[cat];
-                newStartNumbers[cat] = startNumbers[cat] || 1;
+                newStartNumbers[cat] = startNumbers[cat] || "None";
             }
         });
         setCategories(newCategoriesObj);
@@ -33,7 +33,8 @@ function App() {
     };
 
     const handleStartNumberChange = (category, event) => {
-        setStartNumbers({ ...startNumbers, [category]: parseInt(event.target.value) });
+        const value = event.target.value.trim();
+        setStartNumbers({ ...startNumbers, [category]: value.toLowerCase() === "none" ? "None" : value });
     };
 
     const onDragEnd = (result) => {
@@ -114,6 +115,45 @@ function App() {
         setCategories({ ...categories, [category]: updatedFiles });
     };
 
+    const handleLabelOnly = async () => {
+        const formData = new FormData();
+        Object.keys(categories).forEach(category => {
+            categories[category].forEach((file, index) => {
+                formData.append('files', file.data);
+                formData.append('labels', category.startsWith('Unnamed-') ? '' : category);
+            });
+            formData.append('start_numbers', startNumbers[category]);
+        });
+
+        try {
+            const response = await axios.post('http://127.0.0.1:5000/label', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                },
+                responseType: 'blob',
+            });
+
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'LabeledFiles.zip');
+            document.body.appendChild(link);
+            link.click();
+        } catch (error) {
+            console.error('There was an error!', error);
+            if (error.response) {
+                console.error('Response data:', error.response.data);
+                console.error('Response status:', error.response.status);
+                console.error('Response headers:', error.response.headers);
+            } else if (error.request) {
+                console.error('Request data:', error.request);
+            } else {
+                console.error('Error message:', error.message);
+            }
+            console.error('Config:', error.config);
+        }
+    };
+
     return (
         <div className="app-container">
             <img src="/logo.png" alt="Logo" style={{ width: '300px', marginBottom: '20px' }} />
@@ -138,10 +178,10 @@ function App() {
                                 <label>
                                     First file number:
                                     <input
-                                        type="number"
+                                        type="text"
                                         value={startNumbers[category]}
                                         onChange={(e) => handleStartNumberChange(category, e)}
-                                        placeholder="Start number"
+                                        placeholder="Start number or None"
                                     />
                                 </label>
                                 {categories[category].map((file, index) => (
@@ -183,6 +223,7 @@ function App() {
                 ))}
             </DragDropContext>
             <button onClick={handleMerge}>Merge and Label PDFs</button>
+            <button onClick={handleLabelOnly}>Label Files Only</button>
         </div>
     );
 }
