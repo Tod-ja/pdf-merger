@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { FaTimes } from 'react-icons/fa';
+import './App.css'; // Import CSS for additional styling
 
 function App() {
     const [categories, setCategories] = useState({});
@@ -154,34 +155,38 @@ function App() {
         }
     };
 
+    const allStartNumbersNone = Object.values(startNumbers).every(num => num === "None");
+
     return (
         <div className="app-container">
-            <img src="/logo.png" alt="Logo" style={{ width: '300px', marginBottom: '20px' }} />
+            <img src="/logo.png" alt="Logo" className="logo" />
             <input
                 type="text"
                 onChange={handleCategoryInput}
-                placeholder="Enter categories separated by commas (e.g., A, B, C)"
-                style={{ width: '430px' }}
+                placeholder="Enter whitespace or categories separated by commas (e.g., A, B, C)"
+                className="category-input"
             />
             <DragDropContext onDragEnd={onDragEnd}>
                 {categoryList.map(category => (
                     <Droppable droppableId={category} key={category}>
                         {(provided) => (
-                            <div {...provided.droppableProps} ref={provided.innerRef}>
-                                <h4>Category {category.startsWith('Unnamed-') ? 'Unnamed' : category}</h4>
+                            <div {...provided.droppableProps} ref={provided.innerRef} className="category-container">
+                                <h4 className="category-title">Category {category.startsWith('Unnamed-') ? 'Unnamed' : category}</h4>
                                 <input
                                     type="file"
                                     multiple
                                     accept=".pdf,.jpg,.jpeg,.png"
                                     onChange={(e) => handleFileChange(category, e)}
+                                    className="file-input"
                                 />
-                                <label>
-                                    First file number:
+                                <label className="start-number-label">
+                                    First file number (or None if no labeling is required):
                                     <input
                                         type="text"
                                         value={startNumbers[category]}
                                         onChange={(e) => handleStartNumberChange(category, e)}
                                         placeholder="Start number or None"
+                                        className="start-number-input"
                                     />
                                 </label>
                                 {categories[category].map((file, index) => (
@@ -191,26 +196,13 @@ function App() {
                                                 ref={provided.innerRef}
                                                 {...provided.draggableProps}
                                                 {...provided.dragHandleProps}
-                                                style={{
-                                                    marginBottom: '8px',
-                                                    backgroundColor: '#f4f4f4',
-                                                    padding: '10px',
-                                                    borderRadius: '4px',
-                                                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                                                    ...provided.draggableProps.style,
-                                                    display: 'flex',
-                                                    justifyContent: 'space-between',
-                                                    alignItems: 'center',
-                                                }}
+                                                className="file-item"
+                                                style={provided.draggableProps.style}
                                             >
                                                 {file.name}
                                                 <FaTimes
                                                     onClick={() => handleRemoveFile(category, file.id)}
-                                                    style={{
-                                                        color: '#888',
-                                                        cursor: 'pointer',
-                                                        fontSize: '14px',
-                                                    }}
+                                                    className="remove-icon"
                                                 />
                                             </div>
                                         )}
@@ -222,8 +214,14 @@ function App() {
                     </Droppable>
                 ))}
             </DragDropContext>
-            <button onClick={handleMerge}>Merge and Label PDFs</button>
-            <button onClick={handleLabelOnly}>Label Files Only</button>
+            <button onClick={handleMerge} className="merge-button">
+                {allStartNumbersNone ? 'Merge Files' : 'Merge and Label Files'}
+            </button>
+            {!allStartNumbersNone && (
+                <button onClick={handleLabelOnly} className="label-button">
+                    Label Files Only
+                </button>
+            )}
         </div>
     );
 }

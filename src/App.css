@@ -1,0 +1,112 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; 
+    height: 100vh; /* Use 100vh to cover the full height of the viewport */
+    overflow-y: auto; /* Allow vertical scrolling if content exceeds viewport height */
+}
+
+.app-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 500px;
+    margin-top: 57px; 
+    margin-bottom: 20px; 
+}
+
+.logo {
+    width: 300px;
+    margin-bottom: 20px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.category-input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.category-container {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.category-title {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.file-input {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.start-number-label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.start-number-input {
+    width: 96%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.file-item {
+    margin-bottom: 8px;
+    background-color: #e8f4fc;
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.remove-icon {
+    color: #888;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.merge-button, .label-button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.merge-button {
+    background-color: #007bff;
+    color: white;
+}
+
+.label-button {
+    background-color: #28a745;
+    color: white;
+}
+
+.merge-button:hover, .label-button:hover {
+    opacity: 0.9;
+}
