@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      - FRONTEND_URL=http://localhost:3000
+    ports:
+      - "5000:80"  # Maps port 80 in the container to port 5000 on the host
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      - REACT_APP_API_URL=http://localhost:5000
+    ports:
+      - "3000:80"  # Maps port 80 in the container to port 3000 on the host
+    networks:
+      - app-network
+
+networks:
+  app-network:
