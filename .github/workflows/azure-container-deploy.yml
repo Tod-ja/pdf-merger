@@ -1,0 +1,53 @@
+name: Build and Deploy to Azure
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AZURE_CONTAINER_REGISTRY: todjalawregistry
+  AZURE_WEBAPP_NAME: pdf-merger-app
+  AZURE_RESOURCE_GROUP: pdf-merger-rg
+  AZURE_SUBSCRIPTION_ID: 860cc585-e7af-4b32-afb4-f553cc23b62f
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Log in to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }} 
+
+    - name: Set the Azure subscription
+      run: az account set --subscription ${{ env.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Log in to Azure Container Registry
+      run: az acr login --name todjalawregistry
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Build and Push Backend Image
+      run: |
+        docker build -t ${{ env.AZURE_CONTAINER_REGISTRY }}/backend:latest -f backend/Dockerfile ./backend
+        docker push ${{ env.AZURE_CONTAINER_REGISTRY }}/backend:latest
+
+    - name: Build and Push Frontend Image
+      run: |
+        docker build -t ${{ env.AZURE_CONTAINER_REGISTRY }}/frontend:latest -f frontend/Dockerfile ./frontend
+        docker push ${{ env.AZURE_CONTAINER_REGISTRY }}/frontend:latest
+
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        resource-group: ${{ env.AZURE_RESOURCE_GROUP }}
+        images: |
+          ${{ env.AZURE_CONTAINER_REGISTRY }}/backend:latest
+          ${{ env.AZURE_CONTAINER_REGISTRY }}/frontend:latest

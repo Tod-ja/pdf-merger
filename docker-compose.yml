@@ -2,24 +2,20 @@ version: '3.8'
 
 services:
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: todjalawregistry.azurecr.io/backend:latest
     environment:
-      - FRONTEND_URL=http://localhost:3000
+      - FRONTEND_URL=http://frontend:80
     ports:
-      - "5000:80"  # Maps port 80 in the container to port 5000 on the host
+      - "5000:5000"
     networks:
       - app-network
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    image: todjalawregistry.azurecr.io/frontend:latest 
     environment:
-      - REACT_APP_API_URL=http://localhost:5000
+      - REACT_APP_API_URL=http://backend:5000
     ports:
-      - "3000:80"  # Maps port 80 in the container to port 3000 on the host
+      - "80:80"
     networks:
       - app-network
 
