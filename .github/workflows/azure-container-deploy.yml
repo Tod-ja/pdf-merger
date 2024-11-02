@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  AZURE_CONTAINER_REGISTRY: todjalawregistry
+  AZURE_CONTAINER_REGISTRY: todjalawregistry.azurecr.io
   AZURE_WEBAPP_NAME: pdf-merger-app
   AZURE_RESOURCE_GROUP: pdf-merger-rg
   AZURE_SUBSCRIPTION_ID: 860cc585-e7af-4b32-afb4-f553cc23b62f
