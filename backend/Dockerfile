@@ -12,11 +12,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Expose port (Flask default is 5000)
-EXPOSE 80
+EXPOSE 5000
 
 # Set environment variables
 ENV FLASK_APP=app.py
 ENV FLASK_RUN_HOST=0.0.0.0
 
 # Run the application
-CMD ["gunicorn", "--bind", "0.0.0.0:80", "app:create_app()"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:create_app()"]
