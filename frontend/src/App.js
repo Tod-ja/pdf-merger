@@ -8,10 +8,37 @@ import Category from './components/Category';
 
 function App() {
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+  const [token, setToken] = useState(null); // To store JWT token
+  const [username, setUsername] = useState(""); // For login/register username
+  const [password, setPassword] = useState(""); // For login/register password
   const [categories, setCategories] = useState({});
   const [categoryList, setCategoryList] = useState([]);
   const [startNumbers, setStartNumbers] = useState({});
 
+  // Handle user registration
+  const handleRegister = async () => {
+    try {
+      await axios.post(`${API_URL}/register`, { username, password });
+      alert("Registration successful! You can now log in.");
+    } catch (error) {
+      console.error("Registration failed:", error);
+      alert("Error during registration. Check the console for details.");
+    }
+  };
+
+  // Handle user login
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post(`${API_URL}/login`, { username, password });
+      setToken(response.data.access_token); // Save token on successful login
+      alert("Login successful!");
+    } catch (error) {
+      console.error("Login failed:", error);
+      alert("Error during login. Check the console for details.");
+    }
+  };
+
+  // Handle category input changes
   const handleCategoryInput = (event) => {
     const inputCategories = event.target.value
       .split(',')
@@ -89,7 +116,10 @@ function App() {
 
     try {
       const response = await axios.post(`${API_URL}/merge`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}` 
+        },
         responseType: 'blob'
       });
 
@@ -117,7 +147,10 @@ function App() {
 
     try {
       const response = await axios.post(`${API_URL}/label`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`
+        },
         responseType: 'blob'
       });
 
@@ -138,6 +171,25 @@ function App() {
   return (
     <div className="app-container">
       <img src="/logo.png" alt="Logo" className="logo" />
+      
+      {/* Login and Register Section */}
+      <div className="auth-section">
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button onClick={handleLogin}>Login</button>
+        <button onClick={handleRegister}>Register</button>
+      </div>
+
       <input
         type="text"
         onChange={handleCategoryInput}

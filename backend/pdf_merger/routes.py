@@ -1,11 +1,11 @@
-# backend/pdf_merger/routes.py
-
 from flask import Blueprint, request, send_file, jsonify
+from flask_jwt_extended import jwt_required
 from pdf_merger.services.file_processing import merge_pdfs, label_pdfs
 
 merge_bp = Blueprint('merge_bp', __name__)
 
 @merge_bp.route('/merge', methods=['POST'])
+@jwt_required()
 def merge_files():
     try:
         files = request.files.getlist('files')
@@ -26,6 +26,7 @@ def merge_files():
         return jsonify({"error": str(e)}), 500
 
 @merge_bp.route('/label', methods=['POST'])
+@jwt_required()
 def label_files():
     try:
         files = request.files.getlist('files')

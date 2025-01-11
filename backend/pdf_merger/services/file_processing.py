@@ -1,5 +1,3 @@
-# backend/pdf_merger/services/file_processing.py
-
 from PyPDF2 import PdfWriter, PdfReader
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
