@@ -5,6 +5,7 @@ services:
     image: todjalawregistry.azurecr.io/backend:latest
     environment:
       - FRONTEND_URL=https://pdf-merger-app.azurewebsites.net
+      - JWT_SECRET_KEY=your-secret-key 
     ports:
       - "5000:5000"
     networks:
