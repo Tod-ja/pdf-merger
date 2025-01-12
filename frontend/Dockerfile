@@ -13,6 +13,7 @@ ENV REACT_APP_API_URL=$REACT_APP_API_URL
 
 # Copy source code and build
 COPY . .
+RUN echo "REACT_APP_API_URL=$REACT_APP_API_URL" > .env
 RUN npm run build
 
 # Production stage
@@ -23,5 +24,4 @@ COPY --from=build /app/build /usr/share/nginx/html
 
 EXPOSE 80
 
-# Start Nginx server
 CMD ["nginx", "-g", "daemon off;"]

@@ -13,8 +13,10 @@ services:
       
   frontend:
     image: todjalawregistry.azurecr.io/frontend:latest
-    environment:
-      - REACT_APP_API_URL=https://pdf-merger-app.azurewebsites.net
+    build:
+      context: ./frontend
+      args:
+        - REACT_APP_API_URL=https://pdf-merger-app.azurewebsites.net
     ports:
       - "80:80"
     networks:
