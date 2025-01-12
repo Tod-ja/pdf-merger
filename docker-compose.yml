@@ -4,16 +4,16 @@ services:
   backend:
     image: todjalawregistry.azurecr.io/backend:latest
     environment:
-      - FRONTEND_URL=http://frontend:80
+      - FRONTEND_URL=https://pdf-merger-app.azurewebsites.net
     ports:
       - "5000:5000"
     networks:
       - app-network
-
+      
   frontend:
-    image: todjalawregistry.azurecr.io/frontend:latest 
+    image: todjalawregistry.azurecr.io/frontend:latest
     environment:
-      - REACT_APP_API_URL=http://backend:5000
+      - REACT_APP_API_URL=https://pdf-merger-app.azurewebsites.net
     ports:
       - "80:80"
     networks:

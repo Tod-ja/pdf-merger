@@ -14,8 +14,11 @@ def create_app():
 
     # Initialize JWT and CORS
     JWTManager(app)
-    frontend_origin = os.getenv('FRONTEND_URL', 'http://localhost:3000')
-    CORS(app, resources={r"/*": {"origins": frontend_origin}})
+    frontend_origins = [
+        os.getenv('FRONTEND_URL', 'http://localhost:3000'),
+        'https://pdf-merger-app.azurewebsites.net'
+    ]
+    CORS(app, resources={r"/*": {"origins": frontend_origins}})
     
     # Initialize JWT
     JWTManager(app)
