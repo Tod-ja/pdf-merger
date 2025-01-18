@@ -2,15 +2,14 @@ version: '3.8'
 
 services:
   proxy:
-    image: nginx:alpine
+    build: 
+      context: ./proxy
     container_name: proxy
     ports:
       - "80:80"
     depends_on:
       - backend
       - frontend
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
 
   backend:
     image: todjalawregistry.azurecr.io/backend:latest
