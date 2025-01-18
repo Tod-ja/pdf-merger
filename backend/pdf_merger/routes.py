@@ -4,7 +4,7 @@ from pdf_merger.services.file_processing import merge_pdfs, label_pdfs
 
 merge_bp = Blueprint('merge_bp', __name__)
 
-@merge_bp.route('/merge', methods=['POST'])
+@merge_bp.route('/api/merge', methods=['POST'])
 @jwt_required()
 def merge_files():
     try:
@@ -25,7 +25,7 @@ def merge_files():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@merge_bp.route('/label', methods=['POST'])
+@merge_bp.route('/api/label', methods=['POST'])
 @jwt_required()
 def label_files():
     try:

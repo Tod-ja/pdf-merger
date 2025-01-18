@@ -6,7 +6,7 @@ from pdf_merger.db_utils import get_db_connection
 
 auth_bp = Blueprint('auth_bp', __name__)
 
-@auth_bp.route('/register', methods=['POST'])
+@auth_bp.route('/api/register', methods=['POST'])
 def register():
     """Registers a new user."""
     username = request.json.get('username')
@@ -29,7 +29,7 @@ def register():
 
     return jsonify({"message": "User registered successfully"}), 201
 
-@auth_bp.route('/login', methods=['POST'])
+@auth_bp.route('/api/login', methods=['POST'])
 def login():
     """Logs in a user and returns a JWT token."""
     username = request.json.get('username')
@@ -49,7 +49,7 @@ def login():
     finally:
         conn.close()
 
-@auth_bp.route('/protected', methods=['GET'])
+@auth_bp.route('/api/protected', methods=['GET'])
 @jwt_required()
 def protected():
     current_user = get_jwt_identity()

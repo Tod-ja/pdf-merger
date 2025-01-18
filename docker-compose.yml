@@ -1,26 +1,25 @@
 version: '3.8'
 
 services:
+  proxy:
+    image: nginx:alpine
+    container_name: proxy
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+      - frontend
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+
   backend:
     image: todjalawregistry.azurecr.io/backend:latest
-    environment:
-      - FRONTEND_URL=https://pdf-merger-app.azurewebsites.net
-      - JWT_SECRET_KEY=your-secret-key 
-    ports:
-      - "5000:5000"
-    networks:
-      - app-network
+    container_name: backend
+    expose:
+      - "5000"
       
   frontend:
     image: todjalawregistry.azurecr.io/frontend:latest
-    build:
-      context: ./frontend
-      args:
-        - REACT_APP_API_URL=https://pdf-merger-app.azurewebsites.net
-    ports:
-      - "80:80"
-    networks:
-      - app-network
-
-networks:
-  app-network:
+    container_name: frontend
+    expose:
+      - "80"
