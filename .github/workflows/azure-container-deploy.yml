@@ -45,7 +45,13 @@ jobs:
         --build-arg REACT_APP_API_URL=https://pdf-merger-app.azurewebsites.net \
         -f frontend/Dockerfile ./frontend
         docker push ${{ env.AZURE_CONTAINER_REGISTRY }}/frontend:latest
-
+    
+    - name: Build and Push Proxy Image
+      run: |
+        docker build -t ${{ env.AZURE_CONTAINER_REGISTRY }}/proxy:latest \
+          -f proxy/Dockerfile ./proxy
+        docker push ${{ env.AZURE_CONTAINER_REGISTRY }}/proxy:latest
+      
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
