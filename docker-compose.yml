@@ -2,8 +2,7 @@ version: '3.8'
 
 services:
   proxy:
-    build: 
-      context: ./proxy
+    image: todjalawregistry.azurecr.io/proxy:latest
     container_name: proxy
     ports:
       - "80:80"
