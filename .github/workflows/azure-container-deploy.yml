@@ -40,7 +40,10 @@ jobs:
 
     - name: Build and Push Frontend Image
       run: |
-        docker build -t ${{ env.AZURE_CONTAINER_REGISTRY }}/frontend:latest -f frontend/Dockerfile ./frontend
+        docker build \
+        -t ${{ env.AZURE_CONTAINER_REGISTRY }}/frontend:latest \
+        --build-arg REACT_APP_API_URL=https://pdf-merger-app.azurewebsites.net \
+        -f frontend/Dockerfile ./frontend
         docker push ${{ env.AZURE_CONTAINER_REGISTRY }}/frontend:latest
 
     - name: Deploy to Azure Web App

@@ -9,7 +9,6 @@ import Category from './components/Category';
 function App() {
   const API_URL = process.env.REACT_APP_API_URL;
   console.log('Current API_URL:', API_URL);
-  const apiPath = API_URL === 'http://localhost:5000' ? API_URL : '';
   const [token, setToken] = useState(null); // To store JWT token
   const [username, setUsername] = useState(""); // For login/register username
   const [password, setPassword] = useState(""); // For login/register password
@@ -20,7 +19,7 @@ function App() {
   // Handle user registration
   const handleRegister = async () => {
     try {
-      await axios.post('/register', { username, password });
+      await axios.post(`${API_URL}/register`, { username, password });
       alert("Registration successful! You can now log in.");
     } catch (error) {
       console.error("Registration failed:", error);
@@ -31,7 +30,7 @@ function App() {
   // Handle user login
   const handleLogin = async () => {
     try {
-      const response = await axios.post('/login', { username, password });
+      const response = await axios.post(`${API_URL}/login`, { username, password });
       setToken(response.data.access_token);
       alert("Login successful!");
     } catch (error) {
@@ -117,7 +116,7 @@ function App() {
     });
 
     try {
-      const response = await axios.post('/merge', formData, {
+      const response = await axios.post(`${API_URL}/merge`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${token}` 
