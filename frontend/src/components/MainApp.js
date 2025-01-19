@@ -162,11 +162,12 @@ function MainApp({ token }) {
   return (
     <div className="main-app">
       <div className="header">
-        <img src="/logo.png" alt="Logo" className="logo" />
         <button onClick={handleLogout} className="logout-button">Logout</button>
       </div>
 
       <div className="content">
+        <h1 style={{ textAlign: 'center', color: '#2c3e50', marginBottom: '2rem', fontSize: '2rem' }}>PDF Merger</h1>
+        
         <input
           type="text"
           onChange={handleCategoryInput}
