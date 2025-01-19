@@ -21,7 +21,8 @@ function App() {
       alert("Registration successful! You can now log in.");
     } catch (error) {
       console.error("Registration failed:", error);
-      alert("Error during registration. Check the console for details.");
+      const errorMessage = error.response?.data?.error || "An unexpected error occurred during registration.";
+      alert(errorMessage);
     }
   };
 
