@@ -113,6 +113,11 @@ function MainApp({ token }) {
       link.remove();
     } catch (error) {
       console.error('Error during merging:', error);
+      if (error.response?.status === 400) {
+        alert('Error: Please make sure all required fields are filled correctly');
+      } else {
+        alert('Error during merging. Please try again.');
+      }
     }
   };
 
@@ -144,8 +149,15 @@ function MainApp({ token }) {
       link.remove();
     } catch (error) {
       console.error('Error during labeling:', error);
+      if (error.response?.status === 400) {
+        alert('Error: Please make sure all required fields are filled correctly');
+      } else {
+        alert('Error during labeling. Please try again.');
+      }
     }
   };
+
+  const allStartNumbersNone = Object.values(startNumbers).every((num) => num.toLowerCase() === 'none');
 
   return (
     <div className="main-app">
@@ -171,8 +183,8 @@ function MainApp({ token }) {
                 files={categories[category]}
                 startNumber={startNumbers[category]}
                 onFileChange={(e) => handleFileChange(category, e)}
-                onRemoveFile={(fileId) => handleRemoveFile(category, fileId)}
                 onStartNumberChange={(e) => handleStartNumberChange(category, e)}
+                onRemoveFile={(fileId) => handleRemoveFile(category, fileId)}
               />
             ))}
           </div>
@@ -180,11 +192,13 @@ function MainApp({ token }) {
 
         <div className="action-buttons">
           <button onClick={handleMerge} disabled={categoryList.length === 0}>
-            Merge PDFs
+            {allStartNumbersNone ? 'Merge PDFs' : 'Merge and Label PDFs'}
           </button>
-          <button onClick={handleLabelOnly} disabled={categoryList.length === 0}>
-            Label Only
-          </button>
+          {!allStartNumbersNone && (
+            <button onClick={handleLabelOnly} disabled={categoryList.length === 0}>
+              Label Only
+            </button>
+          )}
         </div>
       </div>
     </div>

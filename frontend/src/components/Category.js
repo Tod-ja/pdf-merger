@@ -8,9 +8,9 @@ const Category = ({
   category,
   files,
   startNumber,
-  handleFileChange,
-  handleStartNumberChange,
-  handleRemoveFile
+  onFileChange,
+  onStartNumberChange,
+  onRemoveFile
 }) => (
   <Droppable droppableId={category}>
     {(provided) => (
@@ -20,7 +20,7 @@ const Category = ({
           type="file"
           multiple
           accept=".pdf,.jpg,.jpeg,.png"
-          onChange={(e) => handleFileChange(category, e)}
+          onChange={onFileChange}
           className="file-input"
         />
         <label className="start-number-label">
@@ -28,7 +28,7 @@ const Category = ({
           <input
             type="text"
             value={startNumber}
-            onChange={(e) => handleStartNumberChange(category, e)}
+            onChange={onStartNumberChange}
             placeholder="Start number or None"
             className="start-number-input"
           />
@@ -44,7 +44,7 @@ const Category = ({
               >
                 {file.name}
                 <FaTimes
-                  onClick={() => handleRemoveFile(category, file.id)}
+                  onClick={() => onRemoveFile(file.id)}
                   className="remove-icon"
                 />
               </div>
