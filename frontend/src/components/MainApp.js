@@ -177,9 +177,9 @@ function MainApp({ token, setToken }) {
         
         <input
           type="text"
+          className={`category-input ${categoryList.length > 1 ? 'category-input-wide' : ''}`}
+          placeholder="Enter category names separated by commas"
           onChange={handleCategoryInput}
-          placeholder="Enter categories separated by commas (e.g., A, B, C)"
-          className="category-input"
         />
 
         <DragDropContext onDragEnd={onDragEnd}>

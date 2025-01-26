@@ -88,6 +88,10 @@
   background-color: var(--card-background);
   transition: all 0.3s ease;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  max-width: 400px;
+}
+
+.category-input-wide {
   max-width: 800px;
 }
 
