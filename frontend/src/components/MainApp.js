@@ -24,9 +24,11 @@ function MainApp({ token }) {
   const handleCategoryInput = (event) => {
     const inputCategories = event.target.value
       .split(',')
-      .map((c) => c.trim() || `Unnamed-${Math.random().toString(36).substr(2, 9)}`)
-      .filter(Boolean)
-      .map((c) => c.toUpperCase());
+      .map((c, index) => {
+        const trimmed = c.trim();
+        return trimmed === '' ? `${index + 1}` : trimmed;
+      })
+      .map(c => c.toUpperCase());
 
     const uniqueCategories = Array.from(new Set(inputCategories));
     setCategoryList(uniqueCategories);
