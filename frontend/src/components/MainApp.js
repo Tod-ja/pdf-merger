@@ -18,6 +18,7 @@ function MainApp({ token }) {
   }
 
   const handleLogout = () => {
+    localStorage.removeItem('token');
     navigate('/');
   };
 
@@ -46,8 +47,8 @@ function MainApp({ token }) {
   };
 
   const handleStartNumberChange = (category, event) => {
-    const value = event.target.value.trim();
-    setStartNumbers((prev) => ({ ...prev, [category]: value || 'None' }));
+    const value = event.target.value;
+    setStartNumbers((prev) => ({ ...prev, [category]: value }));
   };
 
   const handleFileChange = (category, event) => {
