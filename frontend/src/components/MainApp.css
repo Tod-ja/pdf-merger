@@ -21,7 +21,7 @@
 .header {
   position: fixed;
   top: 1.5rem;
-  right: 1.5rem;
+  right: 2.5rem;
   z-index: 10;
 }
 
@@ -85,6 +85,9 @@
   background-color: var(--card-background);
   transition: all 0.3s ease;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .category-input:focus {
@@ -98,6 +101,9 @@
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 2rem;
   margin-bottom: 3rem;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .category-container {
@@ -129,15 +135,15 @@
   margin: 0;
   cursor: pointer;
   padding: 0.8rem;
-  border: 2px dashed #4caf50;
+  border: 2px dashed var(--secondary-color);
   border-radius: 8px;
-  background-color: rgba(76, 175, 80, 0.05);
+  background-color: rgba(108, 99, 255, 0.05);
   transition: all 0.3s ease;
   box-sizing: border-box;
 }
 
 .file-input:hover {
-  background-color: rgba(76, 175, 80, 0.1);
+  background-color: rgba(108, 99, 255, 0.1);
 }
 
 .start-number-label {
