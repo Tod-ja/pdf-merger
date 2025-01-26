@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Category from './Category';
 import './MainApp.css';
 
-function MainApp({ token }) {
+function MainApp({ token, setToken }) {
   const navigate = useNavigate();
   const [categories, setCategories] = useState({});
   const [categoryList, setCategoryList] = useState([]);
@@ -19,6 +19,7 @@ function MainApp({ token }) {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    setToken(null);
     navigate('/');
   };
 
