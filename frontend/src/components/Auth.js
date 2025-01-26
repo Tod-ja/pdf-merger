@@ -34,7 +34,7 @@ function Auth({ setToken }) {
     <div className="auth-container">
       <img src="/logo.png" alt="Logo" className="auth-logo" />
       <div className="auth-form">
-        <h2>Welcome to PDF Merger</h2>
+        <h2>Welcome to Avocado</h2>
         <input
           type="text"
           placeholder="Username"
