@@ -177,7 +177,7 @@ function MainApp({ token, setToken }) {
         
         <input
           type="text"
-          className={`category-input ${categoryList.length > 1 ? 'category-input-wide' : ''}`}
+          className="category-input"
           placeholder="Enter category names separated by commas"
           onChange={handleCategoryInput}
         />
