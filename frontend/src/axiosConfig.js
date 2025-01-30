@@ -1,10 +1,19 @@
 import axios from 'axios';
 
-// Set the base URL based on the environment
-const baseURL = process.env.NODE_ENV === 'production' 
-  ? '/api'  // In production, use relative path which will be handled by Azure's reverse proxy
-  : 'http://localhost:5000'; // In development, use the local backend server
+// In production, the nginx proxy will handle the /api routing
+// In development, we need to use the full backend URL
+const baseURL = process.env.NODE_ENV === 'production'
+  ? `${window.location.origin}/api`  // This ensures we use the correct domain in production
+  : 'http://localhost:5000/api';     // In development, use the local backend server with /api prefix
 
-axios.defaults.baseURL = baseURL;
+console.log('Environment:', process.env.NODE_ENV);
+console.log('Base URL:', baseURL);
 
-export default axios;
+const axiosInstance = axios.create({
+  baseURL,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
+export default axiosInstance;
