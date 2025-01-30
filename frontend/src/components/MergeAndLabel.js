@@ -100,7 +100,8 @@ const MergeAndLabel = ({ token, setToken }) => {
     categories.forEach(category => {
       category.files.forEach(file => {
         formData.append('files', file);
-        formData.append('startNumbers', category.startNumber || 'none');
+        formData.append('labels', category.name);
+        formData.append('start_numbers', category.startNumber || 'none');
       });
     });
 
@@ -135,7 +136,8 @@ const MergeAndLabel = ({ token, setToken }) => {
     categories.forEach(category => {
       category.files.forEach(file => {
         formData.append('files', file);
-        formData.append('startNumbers', category.startNumber || '');
+        formData.append('labels', category.name);
+        formData.append('start_numbers', category.startNumber || '');
       });
     });
 
