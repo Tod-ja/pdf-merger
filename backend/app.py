@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Blueprint
 from flask_jwt_extended import JWTManager, jwt_required
 from pdf_merger.routes import merge_bp
 from pdf_merger.auth import auth_bp
@@ -11,6 +11,56 @@ import google.generativeai as genai
 from pdf_merger.utils.text_extraction import extract_text_from_pdf, extract_text_from_doc
 
 load_dotenv()
+
+# Create a new blueprint for document interaction
+doc_bp = Blueprint('doc_bp', __name__)
+
+@doc_bp.route('/document-interaction', methods=['POST'])
+@jwt_required()
+def document_interaction():
+    if not model:
+        return jsonify({'error': 'Gemini API not properly configured'}), 500
+
+    try:
+        files = request.files.getlist('files')
+        if not files:
+            return jsonify({'error': 'No files provided'}), 400
+
+        # Extract text from all files
+        all_text = []
+        for file in files:
+            temp_file = tempfile.NamedTemporaryFile(delete=False)
+            file.save(temp_file.name)
+            
+            if file.filename.lower().endswith('.pdf'):
+                text = extract_text_from_pdf(temp_file.name)
+            elif file.filename.lower().endswith('.doc') or file.filename.lower().endswith('.docx'):
+                text = extract_text_from_doc(temp_file.name)
+            else:
+                os.unlink(temp_file.name)
+                return jsonify({'error': 'Unsupported file type'}), 400
+            
+            all_text.append(text)
+            os.unlink(temp_file.name)
+
+        # Join all text with newlines
+        combined_text = '\n'.join(all_text)
+
+        # Get the user's question
+        question = request.form.get('question')
+        if not question:
+            return jsonify({'error': 'No question provided'}), 400
+
+        # Create the prompt
+        prompt = f"Document content:\n{combined_text}\n\nQuestion: {question}\n\nAnswer:"
+
+        # Get response from Gemini
+        response = model.generate_content(prompt)
+        
+        return jsonify({'response': response.text})
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 def create_app():
     app = Flask(__name__)
@@ -29,95 +79,16 @@ def create_app():
     # Configure Gemini API
     try:
         genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
+        global model
         model = genai.GenerativeModel('gemini-1.5-flash')
     except Exception as e:
         print(f"Error configuring Gemini API: {str(e)}")
         model = None
 
-    # Register blueprints
-    app.register_blueprint(merge_bp)
+    # Register blueprints with /api prefix
+    app.register_blueprint(merge_bp, url_prefix='/api')
     app.register_blueprint(auth_bp, url_prefix='/api')
-
-    @app.route('/api/document-interaction', methods=['POST'])
-    @jwt_required()
-    def document_interaction():
-        if not model:
-            return jsonify({'error': 'Gemini API not properly configured'}), 500
-
-        if 'files' not in request.files:
-            return jsonify({'error': 'No files provided'}), 400
-
-        files = request.files.getlist('files')
-        query = request.form.get('query')
-
-        if not files or not query:
-            return jsonify({'error': 'Both files and query are required'}), 400
-
-        try:
-            # Process each file and extract text
-            all_text = []
-            for file in files:
-                if file.filename == '':
-                    continue
-
-                # Create a temporary file to store the uploaded file
-                temp_file = tempfile.NamedTemporaryFile(delete=False)
-                file.save(temp_file.name)
-
-                try:
-                    # Extract text based on file type
-                    file_extension = os.path.splitext(file.filename)[1].lower()
-                    
-                    if file_extension == '.pdf':
-                        text = extract_text_from_pdf(temp_file.name)
-                    elif file_extension in ['.doc', '.docx']:
-                        text = extract_text_from_doc(temp_file.name)
-                    elif file_extension == '.txt':
-                        with open(temp_file.name, 'r', encoding='utf-8') as f:
-                            text = f.read()
-                    else:
-                        continue
-
-                    if text:  # Only add if we got some text
-                        all_text.append(f"Content from {file.filename}:\n{text}\n")
-                except Exception as e:
-                    print(f"Error processing file {file.filename}: {str(e)}")
-                finally:
-                    # Always clean up the temp file
-                    try:
-                        os.unlink(temp_file.name)
-                    except:
-                        pass
-
-            if not all_text:
-                return jsonify({'error': 'No valid text could be extracted from the provided files'}), 400
-
-            # Combine all text and prepare the prompt
-            combined_text = "\n\n".join(all_text)
-            
-            # Prepare the prompt for Gemini
-            prompt = f"""Please analyze the following documents and answer the user's question.
-            
-Documents:
-{combined_text}
-
-User's Question: {query}
-
-Please provide a clear, well-structured, and comprehensive response based on the content of these documents."""
-
-            # Call Gemini API
-            try:
-                response = model.generate_content(prompt)
-                if not response:
-                    return jsonify({'error': 'No response generated from Gemini API'}), 500
-                return jsonify({'response': response.text})
-            except Exception as e:
-                print(f"Gemini API Error: {str(e)}")
-                return jsonify({'error': 'Error generating response from Gemini API'}), 500
-
-        except Exception as e:
-            print(f"Error: {str(e)}")
-            return jsonify({'error': 'An error occurred while processing the request'}), 500
+    app.register_blueprint(doc_bp, url_prefix='/api')
 
     return app
 
