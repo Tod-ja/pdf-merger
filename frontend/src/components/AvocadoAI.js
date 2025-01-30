@@ -31,7 +31,7 @@ const AvocadoAI = ({ token, setToken }) => {
     files.forEach(file => {
       formData.append('files', file);
     });
-    formData.append('query', query);
+    formData.append('question', query);
 
     setLoading(true);
     try {
