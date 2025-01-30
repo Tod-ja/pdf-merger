@@ -35,7 +35,7 @@ const AvocadoAI = ({ token, setToken }) => {
 
     setLoading(true);
     try {
-      const response = await axios.post('/document-interaction', formData, {
+      const response = await axios.post('/api/document-interaction', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${token}`
