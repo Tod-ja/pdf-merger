@@ -1,5 +1,5 @@
 Flask
-PyPDF2
+PyPDF2==3.0.1
 Werkzeug
 reportlab
 flask-cors
@@ -9,3 +9,6 @@ flask-jwt-extended
 flask-bcrypt
 psycopg2
 python-dotenv
+python-docx==0.8.11
+requests==2.31.0
+google-generativeai==0.3.2
