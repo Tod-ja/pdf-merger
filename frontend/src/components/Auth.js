@@ -10,11 +10,25 @@ function Auth({ setToken }) {
 
   const handleRegister = async () => {
     try {
-      await axios.post('/api/register', { username, password });
+      console.log('Attempting to register user...');
+      const response = await axios.post('/api/register', { username, password });
+      console.log('Registration response:', response);
       alert("Registration successful! You can now log in.");
     } catch (error) {
       console.error("Registration failed:", error);
-      const errorMessage = error.response?.data?.error || "An unexpected error occurred during registration.";
+      console.error("Error details:", {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        config: {
+          url: error.config?.url,
+          method: error.config?.method,
+          baseURL: error.config?.baseURL,
+        }
+      });
+      const errorMessage = error.response?.data?.error || 
+        `Registration failed: ${error.message}. Status: ${error.response?.status || 'unknown'}`;
       alert(errorMessage);
     }
   };
