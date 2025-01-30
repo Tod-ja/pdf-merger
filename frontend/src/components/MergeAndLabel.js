@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import axios from '../axiosConfig';
 import './MergeAndLabel.css';
 
-const Category = ({ category, onRemove, onNameChange, onFilesChange, onStartNumberChange }) => {
+const Category = ({ category, onRemove, onNameChange, onFilesChange, onStartNumberChange, onRemoveFile }) => {
   return (
     <div className="category">
       <div className="category-header">
@@ -30,13 +31,41 @@ const Category = ({ category, onRemove, onNameChange, onFilesChange, onStartNumb
           />
         </div>
         {category.files.length > 0 && (
-          <div className="file-list">
-            {category.files.map((file, index) => (
-              <div key={index} className="file-item">
-                <span className="file-name">{file.name}</span>
+          <Droppable droppableId={`category-${category.id}`}>
+            {(provided) => (
+              <div 
+                className="file-list"
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+              >
+                {category.files.map((file, index) => (
+                  <Draggable 
+                    key={`${file.name}-${index}`}
+                    draggableId={`${file.name}-${index}`}
+                    index={index}
+                  >
+                    {(provided) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        className="file-item"
+                      >
+                        <span className="file-name">{file.name}</span>
+                        <button 
+                          className="remove-file"
+                          onClick={() => onRemoveFile(category.id, index)}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
               </div>
-            ))}
-          </div>
+            )}
+          </Droppable>
         )}
         <div className="start-number-section">
           <input
@@ -92,6 +121,32 @@ const MergeAndLabel = ({ token, setToken }) => {
   const handleStartNumberChange = (categoryId, startNumber) => {
     setCategories(categories.map(category =>
       category.id === categoryId ? { ...category, startNumber } : category
+    ));
+  };
+
+  const handleRemoveFile = (categoryId, fileIndex) => {
+    setCategories(categories.map(category =>
+      category.id === categoryId
+        ? {
+            ...category,
+            files: category.files.filter((_, index) => index !== fileIndex)
+          }
+        : category
+    ));
+  };
+
+  const onDragEnd = (result) => {
+    if (!result.destination) return;
+
+    const categoryId = parseInt(result.source.droppableId.split('-')[1]);
+    const category = categories.find(cat => cat.id === categoryId);
+    
+    const newFiles = Array.from(category.files);
+    const [reorderedFile] = newFiles.splice(result.source.index, 1);
+    newFiles.splice(result.destination.index, 0, reorderedFile);
+
+    setCategories(categories.map(cat =>
+      cat.id === categoryId ? { ...cat, files: newFiles } : cat
     ));
   };
 
@@ -173,59 +228,62 @@ const MergeAndLabel = ({ token, setToken }) => {
   const hasStartNumbers = categories.some(category => category.startNumber !== '');
 
   return (
-    <div className="main-app">
-      <button className="back-btn" onClick={() => navigate('/tools')}>
-        ← Back to Tools
-      </button>
+    <DragDropContext onDragEnd={onDragEnd}>
+      <div className="main-app">
+        <button className="back-btn" onClick={() => navigate('/tools')}>
+          ← Back to Tools
+        </button>
 
-      <button className="logout-btn" onClick={() => {
-        setToken(null);
-        navigate('/');
-      }}>Logout</button>
+        <button className="logout-btn" onClick={() => {
+          setToken(null);
+          navigate('/');
+        }}>Logout</button>
 
-      <div className="content">
-        <div className="header">
-          <div className="title-container">
-            <img src="/logo.png" alt="Logo" className="main-logo" />
-            <h1>Merge & Label</h1>
+        <div className="content">
+          <div className="header">
+            <div className="title-container">
+              <img src="/logo.png" alt="Logo" className="main-logo" />
+              <h1>Merge & Label</h1>
+            </div>
           </div>
-        </div>
 
-        <div className="categories-container">
-          <div className={`categories-grid ${categories.length === 1 ? 'single-category' : ''}`}>
-            {categories.map((category, index) => (
-              <div key={category.id} className="category-wrapper">
-                <Category
-                  category={category}
-                  onRemove={handleRemoveCategory}
-                  onNameChange={handleCategoryNameChange}
-                  onFilesChange={handleCategoryFilesChange}
-                  onStartNumberChange={handleStartNumberChange}
-                />
-                {index === categories.length - 1 && categories.length < 6 && (
-                  <button className="add-category-btn" onClick={handleAddCategory} title="Add Category">
-                    +
-                  </button>
-                )}
-              </div>
-            ))}
+          <div className="categories-container">
+            <div className={`categories-grid ${categories.length === 1 ? 'single-category' : ''}`}>
+              {categories.map((category, index) => (
+                <div key={category.id} className="category-wrapper">
+                  <Category
+                    category={category}
+                    onRemove={handleRemoveCategory}
+                    onNameChange={handleCategoryNameChange}
+                    onFilesChange={handleCategoryFilesChange}
+                    onStartNumberChange={handleStartNumberChange}
+                    onRemoveFile={handleRemoveFile}
+                  />
+                  {index === categories.length - 1 && categories.length < 6 && (
+                    <button className="add-category-btn" onClick={handleAddCategory} title="Add Category">
+                      +
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {categories.length > 0 && (
-          <div className="action-buttons">
-            <button onClick={handleMerge}>
-              {hasStartNumbers ? 'Merge and Label Files' : 'Merge Files'}
-            </button>
-            {hasStartNumbers && (
-              <button onClick={handleLabelOnly}>
-                Label Only
+          {categories.length > 0 && (
+            <div className="action-buttons">
+              <button onClick={handleMerge}>
+                {hasStartNumbers ? 'Merge and Label Files' : 'Merge Files'}
               </button>
-            )}
-          </div>
-        )}
+              {hasStartNumbers && (
+                <button onClick={handleLabelOnly}>
+                  Label Only
+                </button>
+              )}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </DragDropContext>
   );
 };
 
