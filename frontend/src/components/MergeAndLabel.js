@@ -150,7 +150,9 @@ const MergeAndLabel = ({ token, setToken }) => {
         responseType: 'blob'
       });
 
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      // Create blob with correct MIME type for ZIP
+      const blob = new Blob([response.data], { type: 'application/zip' });
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
       
@@ -158,10 +160,11 @@ const MergeAndLabel = ({ token, setToken }) => {
       const date = now.toISOString().split('T')[0];
       const time = now.toTimeString().split(' ')[0].replace(/:/g, '-');
       
-      link.setAttribute('download', `labeled_${date}_${time}.pdf`);
+      link.setAttribute('download', `labeled_files_${date}_${time}.zip`);
       document.body.appendChild(link);
       link.click();
       link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url); // Clean up the URL object
     } catch (error) {
       console.error('Error:', error);
     }

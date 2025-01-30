@@ -40,6 +40,7 @@ def label_files():
         zip_buffer = label_pdfs(files, labels, start_numbers)
         return send_file(
             zip_buffer,
+            mimetype='application/zip',
             as_attachment=True,
             download_name='LabeledFiles.zip'
         )
