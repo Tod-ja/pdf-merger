@@ -15,14 +15,9 @@ load_dotenv()
 def create_app():
     app = Flask(__name__)
     
-    if os.getenv('FRONTEND_URL'):
-        CORS(app, resources={
-            r"/*": {
-                "origins": os.getenv('FRONTEND_URL'),
-                "supports_credentials": True
-            }
-        })
-    else:
+    # In production with nginx, CORS is not needed since everything is on the same domain
+    # Only enable CORS for local development
+    if os.getenv('FLASK_ENV') == 'development':
         CORS(app)
     
     # Configure JWT
