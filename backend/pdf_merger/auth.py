@@ -4,9 +4,9 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from psycopg2 import IntegrityError
 from pdf_merger.db_utils import get_db_connection
 
-auth_bp = Blueprint('auth_bp', __name__)
+auth_bp = Blueprint('auth_bp', __name__, url_prefix='/api')
 
-@auth_bp.route('/api/register', methods=['POST'])
+@auth_bp.route('/register', methods=['POST'])
 def register():
     """Registers a new user."""
     username = request.json.get('username')
@@ -29,7 +29,7 @@ def register():
 
     return jsonify({"message": "User registered successfully"}), 201
 
-@auth_bp.route('/api/login', methods=['POST'])
+@auth_bp.route('/login', methods=['POST'])
 def login():
     """Logs in a user and returns a JWT token."""
     username = request.json.get('username')
@@ -49,7 +49,7 @@ def login():
     finally:
         conn.close()
 
-@auth_bp.route('/api/protected', methods=['GET'])
+@auth_bp.route('/protected', methods=['GET'])
 @jwt_required()
 def protected():
     current_user = get_jwt_identity()
