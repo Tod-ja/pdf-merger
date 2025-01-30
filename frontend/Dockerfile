@@ -8,6 +8,7 @@ COPY package*.json ./
 RUN npm install
 
 # Set environment variables before build
+ENV NODE_ENV=production
 ARG REACT_APP_API_URL
 ENV REACT_APP_API_URL=$REACT_APP_API_URL
 
