@@ -36,7 +36,7 @@ def create_app():
 
     # Register blueprints
     app.register_blueprint(merge_bp)
-    app.register_blueprint(auth_bp)
+    app.register_blueprint(auth_bp, url_prefix='/api')
 
     @app.route('/api/document-interaction', methods=['POST'])
     @jwt_required()
