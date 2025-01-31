@@ -228,26 +228,26 @@ const MergeAndLabel = ({ token, setToken }) => {
   const hasStartNumbers = categories.some(category => category.startNumber !== '');
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <div className="main-app">
-        <button className="back-btn" onClick={() => navigate('/tools')}>
-          ← Back to Tools
-        </button>
+    <div className="main-app">
+      <button className="back-btn" onClick={() => navigate('/tools')}>
+        ← Back to Tools
+      </button>
 
-        <button className="logout-btn" onClick={() => {
-          setToken(null);
-          navigate('/');
-        }}>Logout</button>
+      <button className="logout-btn" onClick={() => {
+        setToken(null);
+        navigate('/');
+      }}>Logout</button>
 
-        <div className="content">
-          <div className="header">
-            <div className="title-container">
-              <img src="/logo.png" alt="Logo" className="main-logo" />
-              <h1>Merge & Label</h1>
-            </div>
+      <div className="content">
+        <div className="header">
+          <div className="title-container">
+            <img src="/logo.png" alt="Logo" className="main-logo" />
+            <h1>Merge & Label</h1>
           </div>
+        </div>
 
-          <div className="categories-container">
+        <div className="categories-container">
+          <DragDropContext onDragEnd={onDragEnd}>
             <div className={`categories-grid ${categories.length === 1 ? 'single-category' : ''}`}>
               {categories.map((category, index) => (
                 <div key={category.id} className="category-wrapper">
@@ -259,16 +259,16 @@ const MergeAndLabel = ({ token, setToken }) => {
                     onStartNumberChange={handleStartNumberChange}
                     onRemoveFile={handleRemoveFile}
                   />
-                  {index === categories.length - 1 && categories.length < 6 && (
-                    <button className="add-category-btn" onClick={handleAddCategory} title="Add Category">
+                  {index === categories.length - 1 && (
+                    <button className="add-category-btn" onClick={handleAddCategory}>
                       +
                     </button>
                   )}
                 </div>
               ))}
             </div>
-          </div>
-
+          </DragDropContext>
+          
           {categories.length > 0 && (
             <div className="action-buttons">
               <button onClick={handleMerge}>
@@ -283,7 +283,7 @@ const MergeAndLabel = ({ token, setToken }) => {
           )}
         </div>
       </div>
-    </DragDropContext>
+    </div>
   );
 };
 

@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background-color: #f4f6f8;
+  background: transparent;
   padding: 1rem;
 }
 
@@ -16,12 +16,13 @@
 }
 
 .auth-form {
-  background: white;
+  background: rgba(255, 255, 255, 0.9);
   padding: 2.5rem;
   border-radius: 16px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
   width: 100%;
   max-width: 400px;
+  backdrop-filter: blur(10px);
 }
 
 .auth-form h2 {
@@ -45,8 +46,8 @@
 
 .auth-form input:focus {
   outline: none;
-  border-color: #4a90e2;
-  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.15);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .auth-buttons {
@@ -58,19 +59,20 @@
 
 .auth-buttons button {
   padding: 1rem 2rem;
-  border: none;
+  background: rgba(255, 255, 255, 0.25);
+  color: #333;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 8px;
-  background-color: #4a90e2;
-  color: white;
   cursor: pointer;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 500;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .auth-buttons button:hover {
-  background-color: #357abd;
+  background: rgba(255, 255, 255, 0.4);
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(74, 144, 226, 0.4);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
