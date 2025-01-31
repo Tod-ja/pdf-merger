@@ -188,7 +188,7 @@ button:disabled {
 }
 
 .category {
-  background: white;
+  background: rgb(255, 255, 255, 0.8);
   border-radius: 12px;
   padding: 1.2rem;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -352,12 +352,12 @@ button:disabled {
   display: flex;
   gap: 1rem;
   justify-content: center;
-  margin-top: 2rem;
+  margin-top: 0.5rem;
 }
 
 .action-buttons button {
   padding: 0.8rem 1.5rem;
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.8);
   color: #333;
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 8px;
