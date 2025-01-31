@@ -29,19 +29,26 @@ def document_interaction():
         # Extract text from all files
         all_text = []
         for file in files:
-            temp_file = tempfile.NamedTemporaryFile(delete=False)
-            file.save(temp_file.name)
-            
-            if file.filename.lower().endswith('.pdf'):
-                text = extract_text_from_pdf(temp_file.name)
-            elif file.filename.lower().endswith('.doc') or file.filename.lower().endswith('.docx'):
-                text = extract_text_from_doc(temp_file.name)
-            else:
-                os.unlink(temp_file.name)
-                return jsonify({'error': 'Unsupported file type'}), 400
-            
-            all_text.append(text)
-            os.unlink(temp_file.name)
+            with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+                file.save(temp_file.name)
+                temp_path = temp_file.name
+
+            try:
+                if file.filename.lower().endswith('.pdf'):
+                    text = extract_text_from_pdf(temp_path)
+                elif file.filename.lower().endswith('.doc') or file.filename.lower().endswith('.docx'):
+                    text = extract_text_from_doc(temp_path)
+                else:
+                    os.unlink(temp_path)
+                    return jsonify({'error': 'Unsupported file type'}), 400
+                
+                all_text.append(text)
+            finally:
+                # Always try to clean up the temp file
+                try:
+                    os.unlink(temp_path)
+                except OSError:
+                    pass  # Ignore errors during cleanup
 
         # Join all text with newlines
         combined_text = '\n'.join(all_text)
@@ -68,7 +75,14 @@ def create_app():
     # In production with nginx, CORS is not needed since everything is on the same domain
     # Only enable CORS for local development
     if os.getenv('FLASK_ENV') == 'development':
-        CORS(app)
+        CORS(app, resources={
+            r"/api/*": {
+                "origins": ["http://localhost:3000"],
+                "supports_credentials": True,
+                "allow_headers": ["Content-Type", "Authorization"],
+                "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+            }
+        })
     
     # Configure JWT
     app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')

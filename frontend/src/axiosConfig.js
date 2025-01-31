@@ -10,6 +10,7 @@ console.log('Base URL:', baseURL);
 
 const axiosInstance = axios.create({
   baseURL,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json'
   }
