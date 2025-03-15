@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from flask import Flask, request, jsonify, Blueprint
 from flask_jwt_extended import JWTManager, jwt_required
 from pdf_merger.routes import merge_bp
-from pdf_merger.auth import auth_bp
+from pdf_merger.auth import auth_bp, conditional_jwt_required
 from datetime import timedelta
 from flask_cors import CORS
 import tempfile
@@ -16,7 +16,7 @@ load_dotenv()
 doc_bp = Blueprint('doc_bp', __name__)
 
 @doc_bp.route('/document-interaction', methods=['POST'])
-@jwt_required()
+@conditional_jwt_required()
 def document_interaction():
     if not model:
         return jsonify({'error': 'Gemini API not properly configured'}), 500
@@ -72,9 +72,13 @@ def document_interaction():
 def create_app():
     app = Flask(__name__)
     
+    # Determine environment
+    flask_env = os.getenv('FLASK_ENV', 'development')
+    app.config['ENV'] = flask_env
+    
     # In production with nginx, CORS is not needed since everything is on the same domain
     # Only enable CORS for local development
-    if os.getenv('FLASK_ENV') == 'development':
+    if flask_env == 'development':
         CORS(app, resources={
             r"/api/*": {
                 "origins": ["http://localhost:3000"],

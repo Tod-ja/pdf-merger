@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from '../axiosConfig';
 import { useNavigate } from 'react-router-dom';
 import './Auth.css';
@@ -6,10 +6,36 @@ import './Auth.css';
 function Auth({ setToken }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [isLocalEnvironment, setIsLocalEnvironment] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if we're running in a local environment
+    const isLocal = window.location.hostname === 'localhost' || 
+                    window.location.hostname === '127.0.0.1';
+    setIsLocalEnvironment(isLocal);
+  }, []);
+
+  const getDevToken = async () => {
+    try {
+      const response = await axios.get('/api/dev-token');
+      if (response.data.access_token) {
+        setToken(response.data.access_token);
+        navigate('/tools');
+      }
+    } catch (error) {
+      console.error("Failed to get dev token:", error);
+    }
+  };
 
   const handleRegister = async () => {
     try {
+      // In local environment, just get a dev token instead of registering
+      if (isLocalEnvironment) {
+        getDevToken();
+        return;
+      }
+
       console.log('Attempting to register user...');
       const response = await axios.post('/api/register', { username, password });
       console.log('Registration response:', response);
@@ -35,9 +61,16 @@ function Auth({ setToken }) {
 
   const handleLogin = async () => {
     try {
+      // In local environment, just get a dev token instead of logging in with credentials
+      if (isLocalEnvironment) {
+        getDevToken();
+        return;
+      }
+
+      // In production, use the entered credentials
       const response = await axios.post('/api/login', { username, password });
       setToken(response.data.access_token);
-      navigate('/app');
+      navigate('/tools');
     } catch (error) {
       console.error("Login failed:", error);
       alert("Invalid credentials");
