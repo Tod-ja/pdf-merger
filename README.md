@@ -1,2 +1,2 @@
-# pdf-merger
-Application to categorize pdf files, add labels and merge them in one single file 
+# Avocado
+Application to help lawers with their administrative tasks
