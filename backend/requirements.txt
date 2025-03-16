@@ -12,3 +12,6 @@ python-dotenv
 python-docx==0.8.11
 requests==2.31.0
 google-generativeai==0.3.2
+openpyxl
+img2pdf
+python-pptx
